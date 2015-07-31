@@ -1440,46 +1440,16 @@ namespace INF2
         {
             if (player.IsAlive && (Utility.GetPlayerTeam(player) != "axis"))
             {
-                int timecount;
                 if (player.CurrentWeapon.Contains("killstreak") || player.CurrentWeapon.Contains("airdrop"))
                 {
                     return;
                 }
+
                 if (((box.GetField<string>("state").Equals("waiting") && box.GetField<string>("player").Equals(player.Name))))
                 {
-                    Entity weapon = Call<Entity>("getentbynum", box.GetField<int>("weaponent"));
-                    if (player.HasWeapon(box.GetField<string>("weapon")))
-                    {
-                        player.Call("givemaxammo", new Parameter[] { box.GetField<string>("weapon") });
-                        player.SwitchToWeapon(box.GetField<string>("weapon"));
-                    }
-                    else
-                    {
-                        if (player.GetField<string>("secondweapon") != "none")
-                        {
-                            if (player.GetField<string>("firstweapon") == player.CurrentWeapon)
-                            {
-                                player.SetField("firstweapon", box.GetField<string>("weapon"));
-                            }
-                            else if (player.GetField<string>("secondweapon") == player.CurrentWeapon)
-                            {
-                                player.SetField("secondweapon", box.GetField<string>("weapon"));
-                            }
-                            player.TakeWeapon(player.CurrentWeapon);
-                        }
-                        else
-                        {
-                            player.SetField("secondweapon", box.GetField<string>("weapon"));
-                        }
-                        player.GiveWeapon(box.GetField<string>("weapon"));
-                        player.Call("givemaxammo", new Parameter[] { box.GetField<string>("weapon") });
-                        player.SwitchToWeaponImmediate(box.GetField<string>("weapon"));
-                    }
-                    weapon.Call("delete", new Parameter[0]);
-                    box.SetField("destroyed", 1);
-                    box.SetField("state", "idle");
-                    box.SetField("player", "");
+                    MysteryGiveWeapon(box, player);
                 }
+
                 else if (box.GetField<string>("state").Equals("idle"))
                 {
                     if (player.GetField<int>("inf2_money") < 500)
@@ -1493,51 +1463,7 @@ namespace INF2
                         box.SetField("state", "using");
                         box.SetField("player", player.Name);
                         box.Call("playsound", "foly_onemanarmy_bag3_plr");
-                        Entity weapon = Call<Entity>("spawn", new Parameter[] { "script_model", new Parameter(new Vector3(box.Origin.X, box.Origin.Y, box.Origin.Z + 10f)) });
-                        weapon.SetField("angles", box.GetField<Vector3>("angles"));
-                        box.SetField("weaponent", new Parameter(weapon.EntRef));
-                        weapon.Call("setmodel", new Parameter[] { "" });
-                        timecount = 0;
-                        string weaponstr = "";
-                        OnInterval(50, delegate
-                        {
-                            weaponstr = Weapons.GetRandomWeapon();
-                            int camo = 0;
-                            if (weaponstr.Contains("camo"))
-                            {
-                                string[] temp = weaponstr.Split(new string[] { "camo" }, 2, StringSplitOptions.RemoveEmptyEntries);
-                                camo = Convert.ToInt32(temp[1].Substring(0, 2));
-                            }
-                            weapon.Call("setmodel", new Parameter[] { new Parameter(Call<string>("GetWeaponModel", weaponstr, camo)) });
-                            Vector3 origin = weapon.Origin;
-                            weapon.Call(0x8277, new Parameter[] { new Parameter(new Vector3(origin.X, origin.Y, origin.Z + 0.37f)), 0.05f });
-                            timecount++;
-                            if (timecount == 60)
-                            {
-                                return false;
-                            }
-                            return true;
-                        });
-                        AfterDelay(3000, delegate
-                        {
-                            box.SetField("state", "waiting");
-                            box.SetField("weapon", weaponstr);
-                            weapon.Call(0x8277, new Parameter[] { new Parameter(new Vector3(box.Origin.X, box.Origin.Y, box.Origin.Z + 10f)), 10 });
-                            box.SetField("player", player.Name);
-                        });
-                        AfterDelay(13000, delegate
-                        {
-                            if (box.GetField<string>("state") != "idle")
-                            {
-                                if (box.GetField<int>("destroyed") == 0)
-                                {
-                                    weapon.Call("delete", new Parameter[0]);
-                                    box.SetField("state", "idle");
-                                    box.SetField("player", "");
-                                }
-                                box.SetField("destroyed", 0);
-                            }
-                        });
+                        MysteryRandomlyWeapons(box, player);
                     }
                 }
             }
@@ -1581,6 +1507,95 @@ namespace INF2
             //        player.SwitchToWeaponImmediate(weapon);
             //    }
             //}
+        }
+
+        private Entity MysteryRandomlyWeapons(Entity box, Entity player)
+        {
+            Entity weapon = Call<Entity>("spawn", "script_model", box.Origin + new Vector3(0, 0, 10));
+            weapon.SetField("angles", box.GetField<Vector3>("angles"));
+            box.SetField("weaponent", weapon.EntRef);
+            int timecount = 0;
+            string weaponstr = "";
+            OnInterval(50, delegate
+            {
+                weaponstr = Weapons.GetRandomWeapon();
+                int camo = 0;
+                if (weaponstr.Contains("camo"))
+                {
+                    string[] temp = weaponstr.Split(new string[] { "camo" }, 2, StringSplitOptions.RemoveEmptyEntries);
+                    camo = Convert.ToInt32(temp[1].Substring(0, 2));
+                }
+                weapon.Call("setmodel", new Parameter[] { new Parameter(Call<string>("GetWeaponModel", weaponstr, camo)) });
+                Vector3 origin = weapon.Origin;
+                weapon.Call(0x8277, new Parameter[] { new Parameter(new Vector3(origin.X, origin.Y, origin.Z + 0.37f)), 0.05f });
+                timecount++;
+                if (timecount == 60)
+                {
+                    return false;
+                }
+                return true;
+            });
+            AfterDelay(3000, delegate
+            {
+                box.SetField("state", "waiting");
+                box.SetField("weapon", weaponstr);
+                weapon.Call(0x8277, new Parameter[] { new Parameter(new Vector3(box.Origin.X, box.Origin.Y, box.Origin.Z + 10f)), 10 });
+                box.SetField("player", player.Name);
+            });
+            AfterDelay(13000, () => MysteryTimeoutDestroy(box, weapon));
+
+            return weapon;
+        }
+
+        private void MysteryGiveWeapon(Entity box, Entity player)
+        {
+            Entity weapon = Call<Entity>("getentbynum", box.GetField<int>("weaponent"));
+            if (player.HasWeapon(box.GetField<string>("weapon")))
+            {
+                player.Call("givemaxammo", new Parameter[] { box.GetField<string>("weapon") });
+                player.SwitchToWeapon(box.GetField<string>("weapon"));
+            }
+            else
+            {
+                if (player.GetField<string>("secondweapon") != "none")
+                {
+                    if (player.GetField<string>("firstweapon") == player.CurrentWeapon)
+                    {
+                        player.SetField("firstweapon", box.GetField<string>("weapon"));
+                    }
+                    else if (player.GetField<string>("secondweapon") == player.CurrentWeapon)
+                    {
+                        player.SetField("secondweapon", box.GetField<string>("weapon"));
+                    }
+                    player.TakeWeapon(player.CurrentWeapon);
+                }
+                else
+                {
+                    player.SetField("secondweapon", box.GetField<string>("weapon"));
+                }
+                player.GiveWeapon(box.GetField<string>("weapon"));
+                player.Call("givemaxammo", new Parameter[] { box.GetField<string>("weapon") });
+                player.SwitchToWeaponImmediate(box.GetField<string>("weapon"));
+            }
+            weapon.Call("delete", new Parameter[0]);
+            box.SetField("destroyed", 1);
+            box.SetField("state", "idle");
+            box.SetField("player", "");
+        }
+
+        private void MysteryTimeoutDestroy(Entity box, Entity weapon)
+        {
+            if (box.GetField<string>("state") != "idle")
+            {
+                if (box.GetField<int>("destroyed") == 0)
+                {
+                    weapon.Call("delete", new Parameter[0]);
+                    box.SetField("state", "idle");
+                    box.SetField("player", "");
+                    box.SetField("weaponent", -1);
+                }
+                box.SetField("destroyed", 0);
+            }
         }
 
         public void usedTeleporter(Entity box, Entity player)
