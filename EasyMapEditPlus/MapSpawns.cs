@@ -35,8 +35,6 @@ namespace EasyMapEditPlus
         {
             Call("precacheShader", "weapon_m16_iw5");
             _rng = new Random();
-            Entity entity = Call<Entity>("getent", new Parameter[] { "care_package", "targetname" });
-            _airdropCollision = Call<Entity>("getent", new Parameter[] { entity.GetField<string>("target"), "targetname" });
             mapname = Utility.GetCurrentMapEditFile(Call<string>("getdvar", new Parameter[] { "mapname" }));
             Call("precachemodel", new Parameter[] { getAlliesFlagModel(Call<string>("getdvar", "mapname")) });
             Call("precachemodel", new Parameter[] { "prop_flag_neutral" });

@@ -50,7 +50,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="INF2Test.cs" />
     <Compile Include="Utility.cs" />
-    <Compile Include="Weapons.cs" />
+    <Compile Include="Weapon.cs" />
     <Compile Include="ZombieRollTheDice.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
