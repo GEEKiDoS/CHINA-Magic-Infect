@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.22823.1
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "INF2", "INF2\INF2.csproj", "{D89B8103-BCF4-43DA-AE48-F1189907C33D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyMapEditPlus", "EasyMapEditPlus\EasyMapEditPlus.csproj", "{6B3F3471-9CD3-4D88-85A1-79E838928AC9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicPlayer", "MusicPlayer\MusicPlayer.csproj", "{F452AF6C-B018-4834-B3B2-561904650DA5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{6B3F3471-9CD3-4D88-85A1-79E838928AC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6B3F3471-9CD3-4D88-85A1-79E838928AC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6B3F3471-9CD3-4D88-85A1-79E838928AC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F452AF6C-B018-4834-B3B2-561904650DA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F452AF6C-B018-4834-B3B2-561904650DA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F452AF6C-B018-4834-B3B2-561904650DA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F452AF6C-B018-4834-B3B2-561904650DA5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
