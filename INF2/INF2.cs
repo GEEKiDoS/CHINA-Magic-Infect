@@ -47,8 +47,6 @@ namespace INF2
 
                 player.SpawnedPlayer += () => OnPlayerSpawned(player);
 
-                Utilities.RawSayTo(player, "^1China Magic Infect ^2Mod ^3by ^6A2ON");
-
             };
 
             //Fogs
@@ -94,7 +92,7 @@ namespace INF2
             //    });
             //});
 
-            Log.Write(LogLevel.Info, "Infect 2 Develop Beta by A2ON");
+            Log.Write(LogLevel.Info, "China Magic Infect Mod by A2ON");
         }
 
         public void OnPlayerSpawned(Entity player)
@@ -287,6 +285,7 @@ namespace INF2
             {
                 "mp_seatown",
                 "mp_aground_ss",
+                "mp_burn_ss",
                 "mp_courtyard_ss",
                 "mp_italy",
                 "mp_meteora",
@@ -378,9 +377,9 @@ namespace INF2
             credits.SetField("glowcolor", new Vector3(1f, 0.5f, 1f));
             credits.GlowAlpha = 1f;
 
-            HudElem credits2 = HudElem.CreateFontString(ent, "hudbig", 0.7f);
-            credits2.SetPoint("CENTER", "BOTTOM", 0, -80);
-            credits2.Call("settext", "Created by A2ON. Vesion 1.0.1100");
+            HudElem credits2 = HudElem.CreateFontString(ent, "hudbig", 0.6f);
+            credits2.SetPoint("CENTER", "BOTTOM", 0, -90);
+            credits2.Call("settext", "Created by A2ON. Vesion 1.1.3");
             credits2.Alpha = 0f;
             credits2.SetField("glowcolor", new Vector3(1f, 0.5f, 1f));
             credits2.GlowAlpha = 1f;
@@ -435,6 +434,27 @@ namespace INF2
             }
         }
 
+        public string GetTeamVoice()
+        {
+            if (Call<string>("getdvar", "g_teamalies").ToLower().Contains("delta"))
+            {
+                return "US";
+            }
+            if (Call<string>("getdvar", "g_teamalies").ToLower().Contains("pmc"))
+            {
+                return "PC";
+            }
+            if (Call<string>("getdvar", "g_teamalies").ToLower().Contains("sas"))
+            {
+                return "UK";
+            }
+            if (Call<string>("getdvar", "g_teamalies").ToLower().Contains("gign"))
+            {
+                return "FR";
+            }
+            return "";
+        }
+
         public override void OnPlayerKilled(Entity player, Entity inflictor, Entity attacker, int damage, string mod, string weapon, Vector3 dir, string hitLoc)
         {
             if (player == null || !player.IsPlayer)
@@ -461,6 +481,7 @@ namespace INF2
                     {
                         attacker.SetField("inf2_money", attacker.GetField<int>("inf2_money") + 100);
                     }
+                    attacker.Call("playlocalsound", GetTeamVoice()+"_1mc_kill_confirmed");
                     if (player.GetField<int>("zombie_incantation") == 1)
                     {
                         attacker.Health = -1;
@@ -479,6 +500,7 @@ namespace INF2
             {
                 if (Utility.GetPlayerTeam(attacker) == "axis" && Utility.GetPlayerTeam(player) == "allies")
                 {
+                    attacker.Call("playlocalsound", GetTeamVoice() + "_1mc_kill_confirmed");
                     if (player.GetField<int>("incantation") == 1)
                     {
                         attacker.Health = -1;

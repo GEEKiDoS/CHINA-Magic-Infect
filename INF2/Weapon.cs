@@ -100,8 +100,6 @@ namespace INF2
                 str = GetShotgunAttachments1[_rng.Next(0, GetShotgunAttachments1.Length)];
                 str2 = GetShotgunAttachments2[_rng.Next(0, GetShotgunAttachments2.Length)];
             }
-            str = "none";
-            str2 = "none";
 
             if (!_otherList.Contains(baseWeapon))
             {
@@ -173,8 +171,12 @@ namespace INF2
 
         public static Weapon GetRandomWeapon()
         {
-            string item = _weaponList[_rng.Next(0, _weaponList.Length)];
+            string item = AddRandomAttachmentToWeapon(_weaponList[_rng.Next(0, _weaponList.Length)]);
             Weapon temp = new Weapon();
+            if (item.Contains("hybrid"))
+            {
+                item = "alt_" + item;
+            }
             temp.Name = GetWeaponName(item);
             temp.Text = item;
             return temp;
