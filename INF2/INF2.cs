@@ -24,6 +24,8 @@ namespace INF2
                 player.SetField("incantation", 0);
                 player.SetField("zombie_incantation", 0);
                 player.SetField("rtd_canroll", 1);
+                player.SetField("inf2_dropgrenade", 0);
+                player.SetField("inf2_invisibility", 0);
 
                 player.SetClientDvar("phys_gravity_ragdoll", "400");
 
@@ -379,7 +381,7 @@ namespace INF2
 
             HudElem credits2 = HudElem.CreateFontString(ent, "hudbig", 0.6f);
             credits2.SetPoint("CENTER", "BOTTOM", 0, -90);
-            credits2.Call("settext", "Created by A2ON. Vesion 1.1.3");
+            credits2.Call("settext", "Created by A2ON. Vesion 1.1.4");
             credits2.Alpha = 0f;
             credits2.SetField("glowcolor", new Vector3(1f, 0.5f, 1f));
             credits2.GlowAlpha = 1f;
@@ -436,19 +438,19 @@ namespace INF2
 
         public string GetTeamVoice()
         {
-            if (Call<string>("getdvar", "g_teamalies").ToLower().Contains("delta"))
+            if (Call<string>("getdvar", "g_teamallies").ToLower().Contains("delta"))
             {
                 return "US";
             }
-            if (Call<string>("getdvar", "g_teamalies").ToLower().Contains("pmc"))
+            if (Call<string>("getdvar", "g_teamallies").ToLower().Contains("pmc"))
             {
                 return "PC";
             }
-            if (Call<string>("getdvar", "g_teamalies").ToLower().Contains("sas"))
+            if (Call<string>("getdvar", "g_teamallies").ToLower().Contains("sas"))
             {
                 return "UK";
             }
-            if (Call<string>("getdvar", "g_teamalies").ToLower().Contains("gign"))
+            if (Call<string>("getdvar", "g_teamallies").ToLower().Contains("gign"))
             {
                 return "FR";
             }
@@ -457,18 +459,6 @@ namespace INF2
 
         public override void OnPlayerKilled(Entity player, Entity inflictor, Entity attacker, int damage, string mod, string weapon, Vector3 dir, string hitLoc)
         {
-            if (player == null || !player.IsPlayer)
-            {
-                return;
-            }
-            if (attacker == null || !attacker.IsPlayer)
-            {
-                return;
-            }
-            if (Utility.GetPlayerTeam(attacker) == Utility.GetPlayerTeam(player))
-            {
-                return;
-            }
             if (Utility.GetPlayerTeam(attacker) == "allies")
             {
                 if (Utility.GetPlayerTeam(player) == "axis")
@@ -481,7 +471,7 @@ namespace INF2
                     {
                         attacker.SetField("inf2_money", attacker.GetField<int>("inf2_money") + 100);
                     }
-                    attacker.Call("playlocalsound", GetTeamVoice()+"_1mc_kill_confirmed");
+                    attacker.Call("playlocalsound", GetTeamVoice() + "_1mc_kill_confirmed");
                     if (player.GetField<int>("zombie_incantation") == 1)
                     {
                         attacker.Health = -1;
@@ -494,14 +484,23 @@ namespace INF2
                         });
                         AfterDelay(100, () => attacker.Health = attacker.GetField<int>("maxhealth"));
                     }
+                    if (Call<int>("getdvarint", "inf2_dropgrenade") == 1)
+                    {
+                        player.SetField("inf2_dropgrenade", 0);
+                        player.Call("MagicGrenade", player.Origin, 2.0f);
+                        player.Call("MagicGrenade", player.Origin, 2.0f);
+                        player.Call("MagicGrenade", player.Origin, 2.0f);
+                        player.Call("MagicGrenade", player.Origin, 2.0f);
+                        player.Call("MagicGrenade", player.Origin, 2.0f);
+                    }
                 }
             }
             else
             {
-                if (Utility.GetPlayerTeam(attacker) == "axis" && Utility.GetPlayerTeam(player) == "allies")
+                if (Utility.GetPlayerTeam(player) == "allies")
                 {
                     attacker.Call("playlocalsound", GetTeamVoice() + "_1mc_kill_confirmed");
-                    if (player.GetField<int>("incantation") == 1)
+                    if (player.GetField<int>("incantation") == 1 && Utility.GetPlayerTeam(attacker) == "axis")
                     {
                         attacker.Health = -1;
                         AfterDelay(10, () =>
@@ -515,6 +514,11 @@ namespace INF2
                     }
                     if (Call<int>("getdvarint", "mod_inf2_zombieblood") == 1)
                     {
+                        player.Call("show");
+                    }
+                    if (Call<int>("getdvarint", "inf2_invisibility") == 1)
+                    {
+                        player.SetField("inf2_invisibility", 0);
                         player.Call("show");
                     }
                 }

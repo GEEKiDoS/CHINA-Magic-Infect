@@ -65,7 +65,10 @@ namespace INF2
             switch (roll)
             {
                 case 0:
-                    rollname = "None";
+                    rollname = "^2Double Health and Roll Again";
+                    player.SetField("maxhealth", player.Health * 2);
+                    player.Health = player.Health * 2;
+                    AfterDelay(2000, () => DoRandom(player));
                     break;
                 case 1:
                     rollname = "^2One Ammo XM25";
@@ -110,10 +113,11 @@ namespace INF2
                     AfterDelay(300, () => player.SwitchToWeaponImmediate("iw5_smaw_mp"));
                     break;
                 case 8:
-                    rollname = "^1Stinger";
+                    rollname = "^1Stinger and Roll Again";
                     player.TakeWeapon(player.CurrentWeapon);
                     player.GiveWeapon("stinger_mp");
                     AfterDelay(300, () => player.SwitchToWeaponImmediate("stinger_mp"));
+                    AfterDelay(2000, () => DoRandom(player));
                     break;
                 case 9:
                     rollname = "^2Extra Speed";
@@ -215,8 +219,7 @@ namespace INF2
                 case 26:
                     rollname = "^2C4";
                     player.GiveWeapon("c4_mp");
-                    player.Call("setweaponammoclip", "c4_mp", 1);
-                    player.Call("setweaponammostock", "c4_mp", 0);
+                    player.Call("givemaxammo", "c4_mp");
                     player.SwitchToWeaponImmediate("c4_mp"); 
                     break;
                 case 27:
@@ -238,7 +241,10 @@ namespace INF2
                                       player.Call("attachshieldmodel", "weapon_riot_shield_mp", "tag_shield_back"));
                     break;
                 case 29:
-                    rollname = "None";
+                    rollname = "^2Double Health and Roll Again";
+                    player.SetField("maxhealth", player.Health * 2);
+                    player.Health = player.Health * 2;
+                    AfterDelay(2000, () => DoRandom(player));
                     break;
                 case 30:
                     rollname = "^2USP45 Akimbo";
@@ -248,7 +254,8 @@ namespace INF2
                     AfterDelay(300, () => player.SwitchToWeaponImmediate("iw5_usp45_mp_akimbo"));
                     break;
                 case 31:
-                    rollname = "None";
+                    rollname = "Roll Again";
+                    AfterDelay(2000, () => DoRandom(player));
                     break;
                 case 32:
                     rollname = "^1Stinger";
@@ -262,10 +269,20 @@ namespace INF2
                     AfterDelay(300, () => player.SwitchToWeaponImmediate("smoke_grenade_mp"));
                     break;
                 case 34:
-                    rollname = "None";
+                    rollname = "^2Riotshield and Roll Again";
+                    player.SetPerk("specialty_fastermelee", true, true);
+                    player.SetPerk("specialty_lightweight", true, true);
+                    player.TakeWeapon(player.CurrentWeapon);
+                    player.GiveWeapon("riotshield_mp");
+                    AfterDelay(300, () => player.SwitchToWeaponImmediate("riotshield_mp"));
+                    player.AfterDelay(150,
+                                      entity =>
+                                      player.Call("attachshieldmodel", "weapon_riot_shield_mp", "tag_shield_back"));
+                    AfterDelay(2000, () => DoRandom(player));
                     break;
                 case 35:
-                    rollname = "None";
+                    rollname = "Drop 5 Grenade If You Die";
+                    player.SetField("inf2_dropgrenade", 1);
                     break;
                 case 36:
                     rollname = "^2Riotshield";
@@ -315,10 +332,12 @@ namespace INF2
                     AfterDelay(300, () => player.SwitchToWeaponImmediate("emp_grenade_mp"));
                     break;
                 case 43:
-                    rollname = "None";
+                    rollname = "Drop 5 Grenade If You Die";
+                    player.SetField("inf2_dropgrenade", 1);
                     break;
                 case 44:
-                    rollname = "None";
+                    rollname = "Drop 5 Grenade If You Die";
+                    player.SetField("inf2_dropgrenade", 1);
                     break;
                 case 45:
                     rollname = "^1You Die After 3 Second";
@@ -367,7 +386,8 @@ namespace INF2
                     OnInterval(100, () => Nades(player, 99));
                     break;
                 case 54:
-                    rollname = "None";
+                    rollname = "^2Unlimited Grenades";
+                    OnInterval(100, () => Nades(player, 99));
                     break;
                 case 55:
                     rollname = "^2Unlimited Grenades";
@@ -378,7 +398,8 @@ namespace INF2
                     player.SetField("zombie_incantation", 1);
                     break;
                 case 57:
-                    rollname = "None";
+                    rollname = "^1Zombie Incantation";
+                    player.SetField("zombie_incantation", 1);
                     break;
                 case 58:
                     rollname = "^1Zombie Incantation";

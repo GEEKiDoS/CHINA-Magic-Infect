@@ -714,12 +714,14 @@ namespace INF2
                 {
                     case 0:
                         player.Call("iprintlnbold", new Parameter[] { "^1You win nothing." });
+                        Call("iprintln", player.Name + " gamble [^1You win nothing^7]");
                         player.Call("playlocalsound", new Parameter[] { "mp_bonus_end" });
                         player.SetField("gamblerstate", "idle");
                         return;
 
                     case 1:
                         player.Call("iprintlnbold", new Parameter[] { "^2You win $500." });
+                        Call("iprintln", player.Name + " gamble [^2You win $500^7]");
                         player.Call("playlocalsound", new Parameter[] { "new_perk_unlocks" });
                         player.SetField("inf2_money", player.GetField<int>("inf2_money") + 500);
                         player.SetField("gamblerstate", "idle");
@@ -727,6 +729,7 @@ namespace INF2
 
                     case 2:
                         player.Call("iprintlnbold", new Parameter[] { "^2You win $1000." });
+                        Call("iprintln", player.Name + " gamble [^2You win $1000^7]");
                         player.Call("playlocalsound", new Parameter[] { "new_perk_unlocks" });
                         player.SetField("inf2_money", player.GetField<int>("inf2_money") + 0x3e8);
                         player.SetField("gamblerstate", "idle");
@@ -734,6 +737,7 @@ namespace INF2
 
                     case 3:
                         player.Call("iprintlnbold", new Parameter[] { "^2You win $2000." });
+                        Call("iprintln", player.Name + " gamble [^2You win $2000^7]");
                         player.Call("playlocalsound", new Parameter[] { "new_perk_unlocks" });
                         player.SetField("inf2_money", player.GetField<int>("inf2_money") + 0x7d0);
                         player.SetField("gamblerstate", "idle");
@@ -741,12 +745,14 @@ namespace INF2
 
                     case 4:
                         player.Call("iprintlnbold", new Parameter[] { "^1You lose $500." });
+                        Call("iprintln", player.Name + " gamble [^1You lose $500^7]");
                         player.Call("playlocalsound", new Parameter[] { "mp_bonus_end" });
                         player.SetField("inf2_money", player.GetField<int>("inf2_money") - 500);
                         player.SetField("gamblerstate", "idle");
                         return;
 
                     case 5:
+                        Call("iprintln", player.Name + " gamble [^0Surprise!^7]");
                         foreach (var item in Utility.getPlayerList())
                         {
                             if (Utility.GetPlayerTeam(item) == "allies")
@@ -761,13 +767,15 @@ namespace INF2
 
                     case 6:
                         player.Call("iprintlnbold", new Parameter[] { "^1You lose all money." });
+                        Call("iprintln", player.Name + " gamble [^1You lost all money^7]");
                         player.Call("playlocalsound", new Parameter[] { "mp_bonus_end" });
                         player.SetField("inf2_money", 0);
                         player.SetField("gamblerstate", "idle");
                         return;
 
                     case 7:
-                        player.Call("iprintlnbold", new Parameter[] { "^2You win riotshield in your back." });
+                        player.Call("iprintlnbold", new Parameter[] { "^2You have a riotshield in your back." });
+                        Call("iprintln", player.Name + " gamble [^2You have a riotshield in your back^7]");
                         player.Call("playlocalsound", new Parameter[] { "mp_bonus_start" });
                         player.Call("attachshieldmodel", new Parameter[] { "weapon_riot_shield_mp", "tag_shield_back" });
                         player.SetField("gamblerstate", "idle");
@@ -775,6 +783,7 @@ namespace INF2
 
                     case 8:
                         player.Call("iprintlnbold", new Parameter[] { "^1Airstrike in your location." });
+                        Call("iprintln", player.Name + " gamble [^1Airstrike in your location^7]");
                         player.Call("playlocalsound", new Parameter[] { "mp_bonus_end" });
                         player.Call("playsound", new Parameter[] { "US_1mc_use_airstrike" });
                         Vector3 loc = player.Origin;
@@ -791,12 +800,14 @@ namespace INF2
                         return;
                     case 9:
                         player.Call("iprintlnbold", new Parameter[] { "^2You win $10000." });
+                        Call("iprintln", player.Name + " gamble [^2You win $10000^7]");
                         player.Call("playlocalsound", new Parameter[] { "mp_bonus_start" });
                         player.SetField("inf2_money", player.GetField<int>("inf2_money") + 0x2710);
                         player.SetField("gamblerstate", "idle");
                         return;
                     case 10:
                         player.Call("iprintlnbold", new Parameter[] { "^1You live or die in 5 second." });
+                        Call("iprintln", player.Name + " gamble [^1You live or die in 5 second^7]");
                         player.Call("playlocalsound", new Parameter[] { "mp_bonus_end" });
                         AfterDelay(1000, () => player.Call("iprintlnbold", new Parameter[] { "^15" }));
                         AfterDelay(1000, () => player.Call("playlocalsound", new Parameter[] { "ui_mp_nukebomb_timer" }));
@@ -829,6 +840,7 @@ namespace INF2
                         return;
                     case 11:
                         player.Call("iprintlnbold", new Parameter[] { "^3Grab all players money!" });
+                        Call("iprintln", player.Name + " gamble [^3Grab all players money^7]");
                         player.Call("playlocalsound", new Parameter[] { "new_perk_unlocks" });
                         AfterDelay(100, () =>
                         {
@@ -849,45 +861,36 @@ namespace INF2
                         return;
                     case 12:
                         player.Call("iprintlnbold", new Parameter[] { "^1Gambler restart." });
+                        Call("iprintln", player.Name + " gamble [^1Gambler restart^7]");
                         player.Call("playlocalsound", new Parameter[] { "mp_bonus_end" });
                         AfterDelay(1000, () => GamblerThink(player));
                         return;
                     case 13:
-                        player.Call("iprintlnbold", new Parameter[] { "^2Wallhack for 1 min." });
+                        player.Call("iprintlnbold", new Parameter[] { "^2Wallhack!" });
+                        Call("iprintln", player.Name + " gamble [^2Wallhack^7]");
                         player.Call("playlocalsound", new Parameter[] { "mp_bonus_start" });
                         player.Call("thermalvisionfofoverlayon", new Parameter[0]);
-                        AfterDelay(60000, () =>
-                        {
-                            player.Call("iprintlnbold", new Parameter[] { "Wallhack off." });
-                            player.Call("thermalvisionfofoverlayoff", new Parameter[0]);
-                        });
                         player.SetField("gamblerstate", "idle");
                         return;
 
                     case 14:
                         player.Call("iprintlnbold", new Parameter[] { "^1Incantation." });
+                        Call("iprintln", player.Name + " gamble [^1Incantation^7]");
                         player.Call("playlocalsound", new Parameter[] { "mp_bonus_end" });
                         player.SetField("incantation", 1);
                         player.SetField("gamblerstate", "idle");
                         return;
                     case 15:
-                        player.Call("iprintlnbold", new Parameter[] { "^1Airstrike in your location." });
-                        player.Call("playlocalsound", new Parameter[] { "US_1mc_use_airstrike" });
-                        Call("playsound", new Parameter[] { "nuke_explosion" });
-                        Vector3 loc2 = player.Origin;
-                        Call("magicbullet", new Parameter[] { "javelin_mp", new Vector3(loc2.X, loc2.Y, loc2.Z + 25000f), loc2, player });
-                        AfterDelay(0, () => Call("magicbullet", new Parameter[] { "ac130_40mm_mp", new Vector3(loc2.X, loc2.Y, loc2.Z + 20000f), Utility.rngVec(loc2, 100), player }));
-                        AfterDelay(400, () => Call("magicbullet", new Parameter[] { "ac130_40mm_mp", new Vector3(loc2.X, loc2.Y, loc2.Z + 20000f), Utility.rngVec(loc2, 100), player }));
-                        AfterDelay(800, () => Call("magicbullet", new Parameter[] { "ac130_40mm_mp", new Vector3(loc2.X, loc2.Y, loc2.Z + 20000f), Utility.rngVec(loc2, 100), player }));
-                        AfterDelay(1200, () => Call("magicbullet", new Parameter[] { "ac130_40mm_mp", new Vector3(loc2.X, loc2.Y, loc2.Z + 20000f), Utility.rngVec(loc2, 100), player }));
-                        AfterDelay(1600, () => Call("magicbullet", new Parameter[] { "ac130_40mm_mp", new Vector3(loc2.X, loc2.Y, loc2.Z + 20000f), Utility.rngVec(loc2, 100), player }));
-                        AfterDelay(2000, () => Call("magicbullet", new Parameter[] { "ac130_40mm_mp", new Vector3(loc2.X, loc2.Y, loc2.Z + 20000f), Utility.rngVec(loc2, 100), player }));
-                        AfterDelay(2400, () => Call("magicbullet", new Parameter[] { "ac130_40mm_mp", new Vector3(loc2.X, loc2.Y, loc2.Z + 20000f), Utility.rngVec(loc2, 100), player }));
-                        AfterDelay(2800, () => Call("magicbullet", new Parameter[] { "ac130_40mm_mp", new Vector3(loc2.X, loc2.Y, loc2.Z + 20000f), Utility.rngVec(loc2, 100), player }));
+                        player.Call("iprintlnbold", new Parameter[] { "^2Invisibility!" });
+                        Call("iprintln", player.Name + " gamble [^2Invisibility^7]");
+                        player.Call("playlocalsound", new Parameter[] { "mp_bonus_start" });
+                        player.SetField("inf2_invisibility", 1);
+                        player.Call("hide");
                         player.SetField("gamblerstate", "idle");
                         return;
                     case 16:
                         player.Call("iprintlnbold", new Parameter[] { "^3You are local tyrant!" });
+                        Call("iprintln", player.Name + " gamble [^3You are local tyrant^7]");
                         player.Call("playlocalsound", new Parameter[] { "new_perk_unlocks" });
                         player.SetField("inf2_money", player.GetField<int>("inf2_money") + 500);
                         foreach (var item in Utility.getPlayerList())
@@ -903,6 +906,7 @@ namespace INF2
                         return;
                     case 17:
                         player.Call("iprintlnbold", new Parameter[] { "^1You infected!" });
+                        Call("iprintln", player.Name + " gamble [^1You infected^7]");
                         player.Call("playlocalsound", new Parameter[] { "mp_bonus_end" });
                         Call("playfx", new Parameter[] { Call<int>("loadfx", new Parameter[] { "props/barrelexp" }), player.Call<Vector3>("gettagorigin", new Parameter[] { "j_head" }) });
                         player.Call("playsound", new Parameter[] { "nuke_explosion" });
@@ -911,6 +915,7 @@ namespace INF2
                         return;
                     case 18:
                         Call("iprintlnbold", new Parameter[] { "^0Team Die or SB Die After 5 second." });
+                        Call("iprintln", player.Name + " gamble [^0Team Die or SB Die After 5 second^7]");
                         player.Call("playsound", new Parameter[] { "mp_bonus_end" });
                         AfterDelay(1000, () => Call("iprintlnbold", new Parameter[] { "^05" }));
                         AfterDelay(1000, () => player.Call("playsound", new Parameter[] { "ui_mp_nukebomb_timer" }));
@@ -930,6 +935,7 @@ namespace INF2
                                 case 0:
                                     Call("iprintlnbold", new Parameter[] { "^1SB Die!" });
                                     player.Call("playsound", new Parameter[] { "mp_bonus_end" });
+                                    AfterDelay(0, () => player.Call("FinishPlayerDamage", null, player, 500, 500, 0, "nuke_mp", player.Origin, new Vector3(), "", 0));
                                     return;
 
                                 case 1:
@@ -951,6 +957,7 @@ namespace INF2
                         return;
                     case 19:
                         player.Call("iprintlnbold", new Parameter[] { "^2Air support in comming!" });
+                        Call("iprintln", player.Name + " gamble [^2Air support in comming^7]");
                         player.Call("playlocalsound", new Parameter[] { "mp_bonus_start" });
                         player.Health = -1;
                         Call("playsound", new Parameter[] { "US_1mc_use_airstrike" });
@@ -965,6 +972,7 @@ namespace INF2
                         return;
                     case 20:
                         Call("iprintlnbold", new Parameter[] { "^2Double Points!" });
+                        Call("iprintln", player.Name + " gamble [^2Double Points^7]");
                         player.Call("playsound", "mp_level_up");
                         player.SetField("gamblerstate", "idle");
                         if (Call<int>("getdvarint", "mod_inf2_doublepoint") == 1)
@@ -986,6 +994,7 @@ namespace INF2
                         return;
                     case 21:
                         Call("iprintlnbold", new Parameter[] { "^2Insta Kill!" });
+                        Call("iprintln", player.Name + " gamble [^2Insta Kill^7]");
                         player.Call("playsound", "mp_level_up");
                         player.SetField("gamblerstate", "idle");
                         if (Call<int>("getdvarint", "mod_inf2_instakill") == 1)
@@ -1007,6 +1016,7 @@ namespace INF2
                         return;
                     case 22:
                         Call("iprintlnbold", new Parameter[] { "^2Max Ammo!" });
+                        Call("iprintln", player.Name + " gamble [^2Max Ammo^7]");
                         player.Call("playsound", "mp_level_up");
                         player.SetField("gamblerstate", "idle");
                         foreach (var item in Utility.getPlayerList())
@@ -1028,6 +1038,7 @@ namespace INF2
                         return;
                     case 23:
                         Call("iprintlnbold", new Parameter[] { "^2Kaboom!" });
+                        Call("iprintln", player.Name + " gamble [^2Kaboom^7]");
                         player.Call("playsound", "nuke_explosion");
                         player.SetField("gamblerstate", "idle");
                         int delay = 1;
@@ -1058,6 +1069,7 @@ namespace INF2
                 case "mp_hardhat":
                 case "mp_interchange":
                 case "mp_cement":
+                case "mp_crosswalk_ss":
                 case "mp_hillside_ss":
                 case "mp_morningwood":
                 case "mp_overwatch":
@@ -1070,6 +1082,7 @@ namespace INF2
                 case "mp_moab":
                 case "mp_nola":
                 case "mp_radar":
+                case "mp_six_ss":
                     return "prop_flag_delta";
                 case "mp_exchange":
                     return "prop_flag_american05";
