@@ -24,8 +24,6 @@ namespace INF2
                 player.SetField("incantation", 0);
                 player.SetField("zombie_incantation", 0);
                 player.SetField("rtd_canroll", 1);
-                player.SetField("inf2_dropgrenade", 0);
-                player.SetField("inf2_invisibility", 0);
 
                 player.SetClientDvar("phys_gravity_ragdoll", "400");
 
@@ -45,10 +43,52 @@ namespace INF2
                     ent.SetClientDvar("camera_thirdPersonCrosshairOffset", "0");
                 });
 
+                player.Call("notifyonplayercommand", "attack", "+attack");
+                player.OnNotify("attack", self =>
+                {
+                    if (Utility.GetPlayerTeam(player) == "allies")
+                    {
+                        if (player.CurrentWeapon == "stinger_mp")
+                        {
+                            Vector3 vector = Call<Vector3>("anglestoforward", new Parameter[] { player.Call<Vector3>("getplayerangles", new Parameter[0]) });
+                            Vector3 dsa = new Vector3(vector.X * 1000000f, vector.Y * 1000000f, vector.Z * 1000000f);
+                            Call("magicbullet", new Parameter[] { "stinger_mp", player.Call<Vector3>("gettagorigin", new Parameter[] { "tag_weapon_left" }), dsa, self });
+                            player.Call("setweaponammoclip", player.CurrentWeapon, 0);
+                        }
+                    }
+                });
+
+                player.OnNotify("weapon_fired", delegate (Entity self, Parameter weapon)
+                {
+                    if (Utility.GetPlayerTeam(player) == "allies")
+                    {
+                        Vector3 vector = Call<Vector3>("anglestoforward", new Parameter[] { player.Call<Vector3>("getplayerangles", new Parameter[0]) });
+                        Vector3 dsa = new Vector3(vector.X * 1000000f, vector.Y * 1000000f, vector.Z * 1000000f);
+                        switch (weapon.As<string>())
+                        {
+                            case "uav_strike_marker_mp":
+                                Call("magicbullet", new Parameter[] { "ac130_105mm_mp", player.Call<Vector3>("gettagorigin", new Parameter[] { "tag_weapon_left" }), dsa, self });
+                                break;
+                            case "defaultweapon_mp":
+                                Call("magicbullet", new Parameter[] { "sam_projectile_mp", player.Call<Vector3>("gettagorigin", new Parameter[] { "tag_weapon_left" }), dsa, self });
+                                break;
+                            case "iw5_spas12_mp_eotech_grip_silencer03_camo11":
+                                Call("magicbullet", new Parameter[] { "rpg_mp", player.Call<Vector3>("gettagorigin", new Parameter[] { "tag_weapon_left" }), dsa, self });
+                                break;
+                            case "iw5_striker_mp_eotech_grip_silencer03_camo11":
+                                Call("magicbullet", new Parameter[] { "xm25_mp", player.Call<Vector3>("gettagorigin", new Parameter[] { "tag_weapon_left" }), dsa, self });
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                });
+
                 OnPlayerSpawned(player);
 
                 player.SpawnedPlayer += () => OnPlayerSpawned(player);
 
+                AfterDelay(500, () => Utilities.RawSayTo(player, "^1CHINA Magic Infect ^2Mod ^3by ^6A2ON"));
             };
 
             //Fogs
@@ -94,7 +134,7 @@ namespace INF2
             //    });
             //});
 
-            Log.Write(LogLevel.Info, "China Magic Infect Mod by A2ON");
+            Log.Write(LogLevel.Info, "CHINA Magic Infect by A2ON");
         }
 
         public void OnPlayerSpawned(Entity player)
@@ -272,8 +312,8 @@ namespace INF2
                 "mp_italy",
                 "mp_meteora",
                 "mp_morningwood",
-                "mp_hillside_ss",
-                "mp_qadeem"
+                "mp_qadeem",
+                "mp_burn_ss"
             };
             string[] blockMaps2 = new string[]
             {
@@ -282,18 +322,6 @@ namespace INF2
                 "mp_mogadishu",
                 "mp_village",
                 "mp_shipbreaker",
-            };
-            string[] blockMaps3 = new string[]
-            {
-                "mp_seatown",
-                "mp_aground_ss",
-                "mp_burn_ss",
-                "mp_courtyard_ss",
-                "mp_italy",
-                "mp_meteora",
-                "mp_morningwood",
-                "mp_hillside_ss",
-                "mp_qadeem",
             };
 
             string str = this.getModelEnv(base.Call<string>("getdvar", new Parameter[] { "mapname" }));
@@ -346,7 +374,8 @@ namespace INF2
             Weapon._weaponList = new string[] {
                 "iw5_44magnum", "iw5_usp45", "iw5_deserteagle", "iw5_mp412", "iw5_p99", "iw5_fnfiveseven", "iw5_fmg9", "iw5_skorpion", "iw5_mp9", "iw5_g18", "iw5_mp5", "iw5_m9", "iw5_p90", "iw5_pp90m1", "iw5_ump45", "iw5_mp7",
                 "iw5_ak47", "iw5_m16", "iw5_m4", "iw5_fad", "iw5_acr", "iw5_type95", "iw5_mk14", "iw5_scar", "iw5_g36c", "iw5_cm901", "rpg", "iw5_smaw", "xm25", "riotshield_mp", "m320","stinger_mp","javelin_mp", "iw5_dragunov",
-                "iw5_msr", "iw5_barrett", "iw5_rsass", "iw5_as50", "iw5_l96a1", "iw5_ksg", "iw5_1887", "iw5_striker", "iw5_aa12", "iw5_usas12", "iw5_spas12", "iw5_m60", "iw5_mk46", "iw5_pecheneg", "iw5_sa80", "iw5_mg36"
+                "iw5_msr", "iw5_barrett", "iw5_rsass", "iw5_as50", "iw5_l96a1", "iw5_ksg", "iw5_1887", "iw5_striker", "iw5_aa12", "iw5_usas12", "iw5_spas12", "iw5_m60", "iw5_mk46", "iw5_pecheneg", "iw5_sa80", "iw5_mg36",
+                "uav_strike_marker_mp", "defaultweapon_mp", "iw5_spas12_mp_eotech_grip_silencer03_camo11", "iw5_striker_mp_eotech_grip_silencer03_camo11", "iw5_m60jugg_mp_eotechlmg_grip_camo11"
              };
         }
 
@@ -381,7 +410,7 @@ namespace INF2
 
             HudElem credits2 = HudElem.CreateFontString(ent, "hudbig", 0.6f);
             credits2.SetPoint("CENTER", "BOTTOM", 0, -90);
-            credits2.Call("settext", "Created by A2ON. Vesion 1.1.4");
+            credits2.Call("settext", "Created by A2ON. Vesion 1.1.5");
             credits2.Alpha = 0f;
             credits2.SetField("glowcolor", new Vector3(1f, 0.5f, 1f));
             credits2.GlowAlpha = 1f;
@@ -436,29 +465,20 @@ namespace INF2
             }
         }
 
-        public string GetTeamVoice()
-        {
-            if (Call<string>("getdvar", "g_teamallies").ToLower().Contains("delta"))
-            {
-                return "US";
-            }
-            if (Call<string>("getdvar", "g_teamallies").ToLower().Contains("pmc"))
-            {
-                return "PC";
-            }
-            if (Call<string>("getdvar", "g_teamallies").ToLower().Contains("sas"))
-            {
-                return "UK";
-            }
-            if (Call<string>("getdvar", "g_teamallies").ToLower().Contains("gign"))
-            {
-                return "FR";
-            }
-            return "";
-        }
-
         public override void OnPlayerKilled(Entity player, Entity inflictor, Entity attacker, int damage, string mod, string weapon, Vector3 dir, string hitLoc)
         {
+            if (player == null || !player.IsPlayer)
+            {
+                return;
+            }
+            if (attacker == null || !attacker.IsPlayer)
+            {
+                return;
+            }
+            if (Utility.GetPlayerTeam(attacker) == Utility.GetPlayerTeam(player))
+            {
+                return;
+            }
             if (Utility.GetPlayerTeam(attacker) == "allies")
             {
                 if (Utility.GetPlayerTeam(player) == "axis")
@@ -471,7 +491,6 @@ namespace INF2
                     {
                         attacker.SetField("inf2_money", attacker.GetField<int>("inf2_money") + 100);
                     }
-                    attacker.Call("playlocalsound", GetTeamVoice() + "_1mc_kill_confirmed");
                     if (player.GetField<int>("zombie_incantation") == 1)
                     {
                         attacker.Health = -1;
@@ -484,23 +503,13 @@ namespace INF2
                         });
                         AfterDelay(100, () => attacker.Health = attacker.GetField<int>("maxhealth"));
                     }
-                    if (Call<int>("getdvarint", "inf2_dropgrenade") == 1)
-                    {
-                        player.SetField("inf2_dropgrenade", 0);
-                        player.Call("MagicGrenade", player.Origin, 2.0f);
-                        player.Call("MagicGrenade", player.Origin, 2.0f);
-                        player.Call("MagicGrenade", player.Origin, 2.0f);
-                        player.Call("MagicGrenade", player.Origin, 2.0f);
-                        player.Call("MagicGrenade", player.Origin, 2.0f);
-                    }
                 }
             }
             else
             {
-                if (Utility.GetPlayerTeam(player) == "allies")
+                if (Utility.GetPlayerTeam(attacker) == "axis" && Utility.GetPlayerTeam(player) == "allies")
                 {
-                    attacker.Call("playlocalsound", GetTeamVoice() + "_1mc_kill_confirmed");
-                    if (player.GetField<int>("incantation") == 1 && Utility.GetPlayerTeam(attacker) == "axis")
+                    if (player.GetField<int>("incantation") == 1)
                     {
                         attacker.Health = -1;
                         AfterDelay(10, () =>
@@ -514,11 +523,6 @@ namespace INF2
                     }
                     if (Call<int>("getdvarint", "mod_inf2_zombieblood") == 1)
                     {
-                        player.Call("show");
-                    }
-                    if (Call<int>("getdvarint", "inf2_invisibility") == 1)
-                    {
-                        player.SetField("inf2_invisibility", 0);
                         player.Call("show");
                     }
                 }

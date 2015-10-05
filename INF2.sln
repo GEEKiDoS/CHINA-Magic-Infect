@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyMapEditPlus", "EasyMapE
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicPlayer", "MusicPlayer\MusicPlayer.csproj", "{F452AF6C-B018-4834-B3B2-561904650DA5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GTA5Wasted", "GTA5Wasted\GTA5Wasted.csproj", "{D327A9E2-73A6-43E9-BF8D-E58EFD6A8156}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{F452AF6C-B018-4834-B3B2-561904650DA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F452AF6C-B018-4834-B3B2-561904650DA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F452AF6C-B018-4834-B3B2-561904650DA5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D327A9E2-73A6-43E9-BF8D-E58EFD6A8156}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D327A9E2-73A6-43E9-BF8D-E58EFD6A8156}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D327A9E2-73A6-43E9-BF8D-E58EFD6A8156}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D327A9E2-73A6-43E9-BF8D-E58EFD6A8156}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
