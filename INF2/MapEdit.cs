@@ -699,21 +699,21 @@ namespace INF2
 
                     case 1:
                         PrintGambleInfo(player, "^2You win $500.");
-                        player.Call("playlocalsound", new Parameter[] { "mp_bonus_start" });
+                        player.Call("playlocalsound", new Parameter[] { "new_perk_unlocks" });
                         player.SetField("inf2_money", player.GetField<int>("inf2_money") + 500);
                         player.SetField("gamblerstate", "idle");
                         return;
 
                     case 2:
                         PrintGambleInfo(player, "^2You win $1000.");
-                        player.Call("playlocalsound", new Parameter[] { "mp_bonus_start" });
+                        player.Call("playlocalsound", new Parameter[] { "new_perk_unlocks" });
                         player.SetField("inf2_money", player.GetField<int>("inf2_money") + 0x3e8);
                         player.SetField("gamblerstate", "idle");
                         return;
 
                     case 3:
                         PrintGambleInfo(player, "^2You win $2000.");
-                        player.Call("playlocalsound", new Parameter[] { "mp_bonus_start" });
+                        player.Call("playlocalsound", new Parameter[] { "new_perk_unlocks" });
                         player.SetField("inf2_money", player.GetField<int>("inf2_money") + 0x7d0);
                         player.SetField("gamblerstate", "idle");
                         return;
@@ -727,6 +727,7 @@ namespace INF2
 
                     case 5:
                         PrintGambleInfo(player, "^0Surprise!");
+                        player.Call("playlocalsound", new Parameter[] { "mp_bonus_end" });
                         foreach (var item in Utility.getPlayerList())
                         {
                             if (Utility.GetPlayerTeam(item) == "allies" && item != player)
@@ -760,7 +761,7 @@ namespace INF2
                         return;
                     case 9:
                         PrintGambleInfo(player, "^2You win $10000.");
-                        player.Call("playlocalsound", new Parameter[] { "mp_bonus_start" });
+                        player.Call("playlocalsound", new Parameter[] { "new_perk_unlocks" });
                         player.SetField("inf2_money", player.GetField<int>("inf2_money") + 0x2710);
                         player.SetField("gamblerstate", "idle");
                         return;
@@ -798,7 +799,7 @@ namespace INF2
                         return;
                     case 11:
                         PrintGambleInfo(player, "^3Grab all players money!");
-                        player.Call("playlocalsound", new Parameter[] { "mp_bonus_start" });
+                        player.Call("playlocalsound", new Parameter[] { "mp_obj_captured" });
                         AfterDelay(100, () =>
                         {
                             int money = 0;
@@ -866,6 +867,7 @@ namespace INF2
                                         {
                                             Call("playfx", new Parameter[] { Call<int>("loadfx", new Parameter[] { "props/barrelexp" }), item.Call<Vector3>("gettagorigin", new Parameter[] { "j_head" }) });
                                             player.Call("suicide", new Parameter[0]);
+                                            player.SetField("inf2_money", player.GetField<int>("inf2_money") + 100);
                                         }
                                     }
 
@@ -877,14 +879,14 @@ namespace INF2
                     case 16:
                         PrintGambleInfo(player, "^3You are local tyrant!");
                         player.Call("iprintlnbold", new Parameter[] { "^3You are local tyrant!" });
-                        player.Call("playlocalsound", new Parameter[] { "mp_bonus_start" });
+                        player.Call("playlocalsound", new Parameter[] { "mp_obj_captured" });
                         player.SetField("inf2_money", player.GetField<int>("inf2_money") + 500);
                         foreach (var item in Utility.getPlayerList())
                         {
                             if (Utility.GetPlayerTeam(item) == "allies" && item != player)
                             {
                                 item.Call("iprintlnbold", new Parameter[] { "^2Player: " + player.Name + " gave you $500." });
-                                item.Call("playlocalsound", new Parameter[] { "mp_bonus_start" });
+                                item.Call("playlocalsound", new Parameter[] { "new_perk_unlocks" });
                                 item.SetField("inf2_money", item.GetField<int>("inf2_money") + 500);
                             }
                         }

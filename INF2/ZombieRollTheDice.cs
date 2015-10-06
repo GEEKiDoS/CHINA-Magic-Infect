@@ -17,6 +17,7 @@ namespace INF2
 
         void RollTheDice_PlayerConnected(Entity obj)
         {
+            obj.Call("visionsetnakedforplayer", "", 1);
             OnPlayerSpawned(obj);
             obj.SpawnedPlayer += () => OnPlayerSpawned(obj);
         }
@@ -67,9 +68,10 @@ namespace INF2
                     rollname = "None";
                     break;
                 case 1:
-                    rollname = "^2XM25";
+                    rollname = "^2One Ammo XM25";
                     player.TakeWeapon(player.CurrentWeapon);
                     player.GiveWeapon("xm25_mp");
+                    player.Call("setweaponammoclip", "xm25_mp", 1);
                     player.Call("setweaponammostock", "xm25_mp", 0);
                     AfterDelay(300, () => player.SwitchToWeaponImmediate("xm25_mp"));
                     break;
@@ -83,14 +85,18 @@ namespace INF2
                     player.Health = 1;
                     break;
                 case 4:
-                    rollname = "^2Triple HP";
+                    rollname = "^2Juggernaut";
                     player.SetField("maxhealth", player.Health * 3);
                     player.Health = player.Health * 3;
+                    player.Call("setmodel", "mp_fullbody_opforce_juggernaut");
+                    player.Call("setviewmodel", "viewhands_juggernaut_opforce");
                     break;
                 case 5:
-                    rollname = "^2Triple HP";
+                    rollname = "^2Juggernaut";
                     player.SetField("maxhealth", player.Health * 3);
                     player.Health = player.Health * 3;
+                    player.Call("setmodel", "mp_fullbody_opforce_juggernaut");
+                    player.Call("setviewmodel", "viewhands_juggernaut_opforce");
                     break;
                 case 6:
                     rollname = "^1You are a one hit kill";
@@ -107,7 +113,6 @@ namespace INF2
                     rollname = "^1Stinger";
                     player.TakeWeapon(player.CurrentWeapon);
                     player.GiveWeapon("stinger_mp");
-                    player.Call("setweaponammostock", "stinger_mp", 0);
                     AfterDelay(300, () => player.SwitchToWeaponImmediate("stinger_mp"));
                     break;
                 case 9:
@@ -119,9 +124,11 @@ namespace INF2
                     OnInterval(100, () => Speed(player, 1.5));
                     break;
                 case 11:
-                    rollname = "^2Triple HP";
+                    rollname = "^2Juggernaut";
                     player.SetField("maxhealth", player.Health * 3);
                     player.Health = player.Health * 3;
+                    player.Call("setmodel", "mp_fullbody_opforce_juggernaut");
+                    player.Call("setviewmodel", "viewhands_juggernaut_opforce");
                     break;
                 case 12:
                     rollname = "^2AA12";
@@ -131,9 +138,11 @@ namespace INF2
                     AfterDelay(300, () => player.SwitchToWeaponImmediate("iw5_aa12_mp_xmags_camo11"));
                     break;
                 case 13:
-                    rollname = "^2Triple HP";
+                    rollname = "^2Juggernaut";
                     player.SetField("maxhealth", player.Health * 3);
                     player.Health = player.Health * 3;
+                    player.Call("setmodel", "mp_fullbody_opforce_juggernaut");
+                    player.Call("setviewmodel", "viewhands_juggernaut_opforce");
                     break;
                 case 14:
                     rollname = "^1You are a one hit kill";
@@ -156,8 +165,6 @@ namespace INF2
                 case 18:
                     rollname = "^2Flash Bang";
                     player.GiveWeapon("flash_grenade_mp");
-                    player.Call("setweaponammoclip", "flash_grenade_mp", 1);
-                    player.Call("setweaponammostock", "flash_grenade_mp", 0);
                     AfterDelay(300, () => player.SwitchToWeaponImmediate("flash_grenade_mp"));
                     break;
                 case 19:
@@ -166,16 +173,19 @@ namespace INF2
                     player.Health = 1;
                     break;
                 case 20:
-                    rollname = "^2One Ammo MK14";
-                    player.GiveWeapon("iw5_mk14_mp_acog");
-                    player.Call("setweaponammoclip", "iw5_mk14_mp_acog", 1);
-                    player.Call("setweaponammostock", "iw5_mk14_mp_acog", 0);
-                    AfterDelay(300, () => player.SwitchToWeaponImmediate("iw5_mk14_mp_acog"));
+                    rollname = "^2One Ammo RSASS";
+                    string weapon = Utilities.BuildWeaponName("iw5_rsass", "none", "none", 0, 0);
+                    player.GiveWeapon(weapon);
+                    player.Call("setweaponammoclip", weapon, 1);
+                    player.Call("setweaponammostock", weapon, 0);
+                    AfterDelay(300, () => player.SwitchToWeaponImmediate(weapon));
                     break;
                 case 21:
-                    rollname = "^2Triple HP";
+                    rollname = "^2Juggernaut";
                     player.SetField("maxhealth", player.Health * 3);
                     player.Health = player.Health * 3;
+                    player.Call("setmodel", "mp_fullbody_opforce_juggernaut");
+                    player.Call("setviewmodel", "viewhands_juggernaut_opforce");
                     break;
                 case 22:
                     rollname = "^2SMAW";
@@ -209,10 +219,11 @@ namespace INF2
                     AfterDelay(300, () => player.SwitchToWeaponImmediate("c4_mp"));
                     break;
                 case 27:
-                    rollname = "^2Grenade Lanucher";
-                    player.GiveWeapon("gl_mp");
-                    player.Call("setweaponammostock", "gl_mp", 0);
-                    AfterDelay(300, () => player.SwitchToWeaponImmediate("gl_mp"));
+                    rollname = "^2Juggernaut";
+                    player.SetField("maxhealth", player.Health * 3);
+                    player.Health = player.Health * 3;
+                    player.Call("setmodel", "mp_fullbody_opforce_juggernaut");
+                    player.Call("setviewmodel", "viewhands_juggernaut_opforce");
                     break;
                 case 28:
                     rollname = "^2Riotshield";
@@ -229,7 +240,7 @@ namespace INF2
                     rollname = "None";
                     break;
                 case 30:
-                    rollname = "^1USP45 AKIMBO";
+                    rollname = "^2USP45 Akimbo";
                     player.TakeWeapon(player.CurrentWeapon);
                     player.GiveWeapon("iw5_usp45_mp_akimbo");
                     player.Call("setweaponammostock", "iw5_usp45_mp_akimbo", 0);
@@ -242,14 +253,11 @@ namespace INF2
                     rollname = "^1Stinger";
                     player.TakeWeapon(player.CurrentWeapon);
                     player.GiveWeapon("stinger_mp");
-                    player.Call("setweaponammostock", "stinger_mp", 0);
                     AfterDelay(300, () => player.SwitchToWeaponImmediate("stinger_mp"));
                     break;
                 case 33:
                     rollname = "^2Smoke";
                     player.GiveWeapon("smoke_grenade_mp");
-                    player.Call("setweaponammoclip", "smoke_grenade_mp", 1);
-                    player.Call("setweaponammostock", "smoke_grenade_mp", 0);
                     AfterDelay(300, () => player.SwitchToWeaponImmediate("smoke_grenade_mp"));
                     break;
                 case 34:
@@ -293,21 +301,16 @@ namespace INF2
                 case 40:
                     rollname = "^2Concussion Grenade";
                     player.GiveWeapon("concussion_grenade_mp");
-                    player.Call("setweaponammoclip", "concussion_grenade_mp", 1);
-                    player.Call("setweaponammostock", "concussion_grenade_mp", 0);
                     AfterDelay(300, () => player.SwitchToWeaponImmediate("concussion_grenade_mp"));
                     break;
                 case 41:
                     rollname = "^2Throwing Knife";
                     player.GiveWeapon("throwingknife_mp");
-                    player.Call("setweaponammoclip", "throwingknife_mp", 1);
-                    player.Call("setweaponammostock", "throwingknife_mp", 0);
+                    player.SwitchToWeaponImmediate("throwingknife_mp");
                     break;
                 case 42:
                     rollname = "^2EMP Grenade";
                     player.GiveWeapon("emp_grenade_mp");
-                    player.Call("setweaponammoclip", "emp_grenade_mp", 1);
-                    player.Call("setweaponammostock", "emp_grenade_mp", 0);
                     AfterDelay(300, () => player.SwitchToWeaponImmediate("emp_grenade_mp"));
                     break;
                 case 43:
@@ -339,11 +342,12 @@ namespace INF2
                     rollname = "None";
                     break;
                 case 50:
-                    rollname = "^2One Ammo Barrett";
-                    player.GiveWeapon("iw5_barrett_mp");
-                    player.Call("setweaponammoclip", "iw5_barrett_mp", 1);
-                    player.Call("setweaponammostock", "iw5_barrett_mp", 0);
-                    AfterDelay(300, () => player.SwitchToWeaponImmediate("iw5_barrett_mp"));
+                    rollname = "^2One Ammo SVD";
+                    string weapon2 = Utilities.BuildWeaponName("iw5_dragunov", "none", "none", 0, 0);
+                    player.GiveWeapon(weapon2);
+                    player.Call("setweaponammoclip", weapon2, 1);
+                    player.Call("setweaponammostock", weapon2, 0);
+                    AfterDelay(300, () => player.SwitchToWeaponImmediate(weapon2));
                     break;
                 case 51:
                     rollname = "^2Unlimited Grenades";
@@ -352,10 +356,10 @@ namespace INF2
                 case 52:
                     rollname = "^2RPG";
                     player.TakeWeapon(player.CurrentWeapon);
-                    player.GiveWeapon("iw5_barrett_mp");
-                    player.Call("setweaponammoclip", "iw5_barrett_mp", 1);
-                    player.Call("setweaponammostock", "iw5_barrett_mp", 0);
-                    AfterDelay(300, () => player.SwitchToWeaponImmediate("iw5_barrett_mp"));
+                    player.GiveWeapon("rpg_mp");
+                    player.Call("setweaponammoclip", "rpg_mp", 1);
+                    player.Call("setweaponammostock", "rpg_mp", 0);
+                    AfterDelay(300, () => player.SwitchToWeaponImmediate("rpg_mp"));
                     break;
                 case 53:
                     rollname = "^2Unlimited Grenades";
@@ -423,3 +427,4 @@ namespace INF2
         }
     }
 }
+
