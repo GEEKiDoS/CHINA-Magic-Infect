@@ -147,39 +147,36 @@ namespace INF2
 
         public string getDoorText(Entity door, Entity player)
         {
-            int field = door.GetField<int>("hp");
-            int num2 = door.GetField<int>("maxhp");
-            if (!(Utility.GetPlayerTeam(player) == "allies"))
-            {
-                string str2;
-                if ((Utility.GetPlayerTeam(player) == "axis") && ((str2 = door.GetField<string>("state")) != null))
-                {
-                    if (str2 == "open")
-                    {
-                        return "Door is Open.";
-                    }
-                    if (str2 == "close")
-                    {
-                        return "Press ^3[{+activate}] ^7to attack the door.";
-                    }
-                    if (str2 == "broken")
-                    {
-                        return "^1Door is Broken.";
-                    }
-                }
-            }
-            else
+            int hp = door.GetField<int>("hp");
+            int maxhp = door.GetField<int>("maxhp");
+            if (player.GetField<string>("sessionteam") == "allies")
             {
                 switch (door.GetField<string>("state"))
                 {
                     case "open":
-                        return string.Concat(new object[] { "Door is Open. Press ^3[{+activate}] ^7to close it. (", field, "/", num2, ")" });
-
+                        if (player.CurrentWeapon == "defaultweapon_mp")
+                            return "Door is Open. Press ^3[{+activate}] ^7to repair it. (" + hp + "/" + maxhp + ")";
+                        return "Door is Open. Press ^3[{+activate}] ^7to close it. (" + hp + "/" + maxhp + ")";
                     case "close":
-                        return string.Concat(new object[] { "Door is Closed. Press ^3[{+activate}] ^7to open it. (", field, "/", num2, ")" });
-
+                        if (player.CurrentWeapon == "defaultweapon_mp")
+                            return "Door is Closed. Press ^3[{+activate}] ^7to repair it. (" + hp + "/" + maxhp + ")";
+                        return "Door is Closed. Press ^3[{+activate}] ^7to open it. (" + hp + "/" + maxhp + ")";
                     case "broken":
+                        if (player.CurrentWeapon == "defaultweapon_mp")
+                            return "Door is Broken. Press ^3[{+activate}] ^7to repair it. (" + hp + "/" + maxhp + ")";
                         return "^1Door is Broken.";
+                }
+            }
+            else if (player.GetField<string>("sessionteam") == "axis")
+            {
+                switch (door.GetField<string>("state"))
+                {
+                    case "open":
+                        return "Door is Open.";
+                    case "close":
+                        return "Press ^3[{+activate}] ^7to attack the door.";
+                    case "broken":
+                        return "^1Door is Broken";
                 }
             }
             return "";
@@ -204,7 +201,7 @@ namespace INF2
             {
                 return "";
             }
-            return "Press ^3[{+activate}] ^7to by Ammo. [Cost: ^2$^3300^7]";
+            return "Press ^3[{+activate}] ^7to buy Ammo. [Cost: ^2$^3300^7]";
         }
 
         public string getMysteryText(Entity box, Entity player)
@@ -294,7 +291,7 @@ namespace INF2
             Vector3 v = origin;
             v.Z += 17f;
             Entity laptop = Call<Entity>("spawn", new Parameter[] { "script_model", new Parameter(v) });
-            laptop.Call("setmodel", new Parameter[] { "com_laptop_2_open" });
+            laptop.Call("setmodel", new Parameter[] { "weapon_uav_control_unit" });
             LaptopRotate(laptop);
             int num = 0x1f - curObjID++;
             Call("objective_state", new Parameter[] { num, "active" });
@@ -407,6 +404,35 @@ namespace INF2
             return entity;
         }
 
+        public Entity CreateFloor2(Vector3 corner1, Vector3 corner2)
+        {
+            float num = corner1.X - corner2.X;
+            if (num < 0f)
+            {
+                num *= -1f;
+            }
+            float num2 = corner1.Y - corner2.Y;
+            if (num2 < 0f)
+            {
+                num2 *= -1f;
+            }
+            int num3 = (int)Math.Round((double)(num / 50f), 0);
+            int num4 = (int)Math.Round((double)(num2 / 30f), 0);
+            Vector3 vector = corner2 - corner1;
+            Vector3 vector2 = new Vector3(vector.X / ((float)num3), vector.Y / ((float)num4), 0f);
+            Entity entity = Call<Entity>("spawn", new Parameter[] { "script_origin", new Parameter(new Vector3((corner1.X + corner2.X) / 2f, (corner1.Y + corner2.Y) / 2f, corner1.Z)) });
+            for (int i = 0; i < num3; i++)
+            {
+                for (int j = 0; j < num4; j++)
+                {
+                    Entity entity2 = spawnCrateRed((corner1 + (new Vector3(vector2.X, 0f, 0f) * i)) + (new Vector3(0f, vector2.Y, 0f) * j), new Vector3(0f, 0f, 0f));
+                    entity2.Call("enablelinkto", new Parameter[0]);
+                    entity2.Call("linkto", new Parameter[] { entity });
+                }
+            }
+            return entity;
+        }
+
         public void CreateGambler(Vector3 origin, Vector3 angle)
         {
             Entity box = Call<Entity>("spawn", new Parameter[] { "script_model", new Parameter(origin) });
@@ -417,7 +443,7 @@ namespace INF2
             Vector3 v = origin;
             v.Z += 17f;
             Entity laptop = Call<Entity>("spawn", new Parameter[] { "script_model", new Parameter(v) });
-            laptop.Call("setmodel", new Parameter[] { "com_laptop_2_open" });
+            laptop.Call("setmodel", new Parameter[] { "weapon_uav_control_unit" });
             LaptopRotate(laptop);
             int num = 0x1f - curObjID++;
             Call("objective_state", new Parameter[] { num, "active" });
@@ -457,6 +483,17 @@ namespace INF2
             }
         }
 
+        public void CreateRamp2(Vector3 top, Vector3 bottom)
+        {
+            int num2 = (int)Math.Ceiling((double)(top.DistanceTo(bottom) / 30f));
+            Vector3 vector = new Vector3((top.X - bottom.X) / ((float)num2), (top.Y - bottom.Y) / ((float)num2), (top.Z - bottom.Z) / ((float)num2));
+            Vector3 vector2 = base.Call<Vector3>("vectortoangles", new Parameter[] { new Parameter(top - bottom) });
+            Vector3 angles = new Vector3(vector2.Z, vector2.Y + 90f, vector2.X);
+            for (int i = 0; i <= num2; i++)
+            {
+                spawnCrateRed(bottom + (vector * i), angles);
+            }
+        }
 
         public void createSpawn(string type, Vector3 origin, Vector3 angle)
         {
@@ -607,12 +644,12 @@ namespace INF2
             box.SetField("player", "");
             box.SetField("destroyed", 0);
             box.SetField("weaponent", -1);
-            CreateBoxShader(box, "hud_icon_cm901");
+            CreateBoxShader(box, "weapon_aks74u");
             int num = 31 - curObjID++;
             Call("objective_state", new Parameter[] { num, "active" });
             Call("objective_team", new Parameter[] { num, "allies" });
             Call("objective_position", new Parameter[] { num, new Parameter(origin) });
-            Call("objective_icon", new Parameter[] { num, "hud_icon_cm901" });
+            Call("objective_icon", new Parameter[] { num, "weapon_aks74u" });
 
             MakeUsable(box, "mystery", 50);
         }
@@ -628,7 +665,7 @@ namespace INF2
             Vector3 v = origin;
             v.Z += 17f;
             Entity laptop = Call<Entity>("spawn", new Parameter[] { "script_model", new Parameter(v) });
-            laptop.Call("setmodel", new Parameter[] { "com_laptop_2_open" });
+            laptop.Call("setmodel", new Parameter[] { "weapon_uav_control_unit" });
             LaptopRotate(laptop);
             HudElem elem = HudElem.NewHudElem();
             elem.SetShader("hudicon_neutral", 20, 20);
@@ -728,6 +765,7 @@ namespace INF2
                     case 5:
                         PrintGambleInfo(player, "^0Surprise!");
                         player.Call("playlocalsound", new Parameter[] { "mp_bonus_end" });
+                        player.SetField("inf2_money", 0);
                         foreach (var item in Utility.getPlayerList())
                         {
                             if (Utility.GetPlayerTeam(item) == "allies" && item != player)
@@ -866,7 +904,7 @@ namespace INF2
                                         if (Utility.GetPlayerTeam(item) == "allies" && item != player)
                                         {
                                             Call("playfx", new Parameter[] { Call<int>("loadfx", new Parameter[] { "props/barrelexp" }), item.Call<Vector3>("gettagorigin", new Parameter[] { "j_head" }) });
-                                            player.Call("suicide", new Parameter[0]);
+                                            item.Call("suicide", new Parameter[0]);
                                             player.SetField("inf2_money", player.GetField<int>("inf2_money") + 100);
                                         }
                                     }
@@ -878,7 +916,6 @@ namespace INF2
                         break;
                     case 16:
                         PrintGambleInfo(player, "^3You are local tyrant!");
-                        player.Call("iprintlnbold", new Parameter[] { "^3You are local tyrant!" });
                         player.Call("playlocalsound", new Parameter[] { "mp_obj_captured" });
                         player.SetField("inf2_money", player.GetField<int>("inf2_money") + 500);
                         foreach (var item in Utility.getPlayerList())
@@ -998,6 +1035,7 @@ namespace INF2
                         PrintGambleInfo(player, "^2Juggernaut");
                         player.Call("playlocalsound", new Parameter[] { "mp_bonus_start" });
                         player.Call("setmodel", "mp_fullbody_ally_juggernaut");
+                        player.Call("setviewmodel", "viewhands_juggernaut_ally");
                         player.SetField("maxhealth", 300);
                         player.Health = 300;
                         player.SetField("gamblerstate", "idle");
@@ -1021,9 +1059,13 @@ namespace INF2
                         break;
                     case 26:
                         PrintGambleInfo(player, "^1You Boooooom!");
-                        Call("RadiusDamage", new Parameter[] { player.Origin, 500, 500, 500, player, "MOD_EXPLOSIVE", "nuke_mp" });
-                        Call("playfx", new Parameter[] { this.Call<int>("loadfx", new Parameter[] { "explosions/tanker_explosion" }), player.Origin });
-                        player.Call("playsound", new Parameter[] { "cobra_helicopter_crash" });
+                        player.Call("suicide");
+                        AfterDelay(300, () =>
+                        {
+                            Call("RadiusDamage", new Parameter[] { player.Origin, 500, 500, 500, player, "MOD_EXPLOSIVE", "nuke_mp" });
+                            Call("playfx", new Parameter[] { this.Call<int>("loadfx", new Parameter[] { "explosions/tanker_explosion" }), player.Origin });
+                            player.Call("playsound", new Parameter[] { "cobra_helicopter_crash" });
+                        });
                         player.SetField("gamblerstate", "idle");
                         break;
                 }
@@ -1144,12 +1186,30 @@ namespace INF2
                                         }
                                         continue;
                                     }
+                                case "crate2":
+                                    {
+                                        strArray = strArray[1].Split(new char[] { ';' });
+                                        if (strArray.Length >= 2)
+                                        {
+                                            spawnCrateRed(Utility.ParseVector3(strArray[0]), Utility.ParseVector3(strArray[1]));
+                                        }
+                                        continue;
+                                    }
                                 case "ramp":
                                     {
                                         strArray = strArray[1].Split(new char[] { ';' });
                                         if (strArray.Length >= 2)
                                         {
                                             CreateRamp(Utility.ParseVector3(strArray[0]), Utility.ParseVector3(strArray[1]));
+                                        }
+                                        continue;
+                                    }
+                                case "ramp2":
+                                    {
+                                        strArray = strArray[1].Split(new char[] { ';' });
+                                        if (strArray.Length >= 2)
+                                        {
+                                            CreateRamp2(Utility.ParseVector3(strArray[0]), Utility.ParseVector3(strArray[1]));
                                         }
                                         continue;
                                     }
@@ -1204,6 +1264,15 @@ namespace INF2
                                         if (strArray.Length >= 2)
                                         {
                                             CreateFloor(Utility.ParseVector3(strArray[0]), Utility.ParseVector3(strArray[1]));
+                                        }
+                                        continue;
+                                    }
+                                case "floor2":
+                                    {
+                                        strArray = strArray[1].Split(new char[] { ';' });
+                                        if (strArray.Length >= 2)
+                                        {
+                                            CreateFloor2(Utility.ParseVector3(strArray[0]), Utility.ParseVector3(strArray[1]));
                                         }
                                         continue;
                                     }
@@ -1448,15 +1517,69 @@ namespace INF2
         private void DoAirstrike(Entity player, Vector3 origin)
         {
             Vector3 loc = origin;
-            Call("magicbullet", new Parameter[] { "javelin_mp", new Vector3(loc.X, loc.Y, loc.Z + 25000f), loc, player });
-            AfterDelay(0, () => Call("magicbullet", new Parameter[] { "ac130_40mm_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
-            AfterDelay(400, () => Call("magicbullet", new Parameter[] { "ac130_40mm_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
-            AfterDelay(800, () => Call("magicbullet", new Parameter[] { "ac130_40mm_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
-            AfterDelay(1200, () => Call("magicbullet", new Parameter[] { "ac130_40mm_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
-            AfterDelay(1600, () => Call("magicbullet", new Parameter[] { "ac130_40mm_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
-            AfterDelay(2000, () => Call("magicbullet", new Parameter[] { "ac130_40mm_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
-            AfterDelay(2400, () => Call("magicbullet", new Parameter[] { "ac130_40mm_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
-            AfterDelay(2800, () => Call("magicbullet", new Parameter[] { "ac130_40mm_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
+            switch (_rng.Next(5))
+            {
+                case 0:
+                    AfterDelay(0, () => Call("magicbullet", new Parameter[] { "ac130_40mm_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(300, () => Call("magicbullet", new Parameter[] { "ac130_40mm_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(600, () => Call("magicbullet", new Parameter[] { "ac130_40mm_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(900, () => Call("magicbullet", new Parameter[] { "ac130_40mm_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(1200, () => Call("magicbullet", new Parameter[] { "ac130_40mm_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(1500, () => Call("magicbullet", new Parameter[] { "ac130_40mm_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(1800, () => Call("magicbullet", new Parameter[] { "ac130_40mm_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(2100, () => Call("magicbullet", new Parameter[] { "ac130_40mm_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(2400, () => Call("magicbullet", new Parameter[] { "ac130_40mm_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(2700, () => Call("magicbullet", new Parameter[] { "ac130_40mm_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(3000, () => Call("magicbullet", new Parameter[] { "ac130_40mm_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(3300, () => Call("magicbullet", new Parameter[] { "ac130_40mm_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
+                    break;
+
+                case 1:
+                    AfterDelay(0, () => Call("magicbullet", new Parameter[] { "ac130_105mm_mp", new Vector3(loc.X, loc.Y, loc.Z + 10000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(1000, () => Call("magicbullet", new Parameter[] { "ac130_105mm_mp", new Vector3(loc.X, loc.Y, loc.Z + 10000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(2000, () => Call("magicbullet", new Parameter[] { "ac130_105mm_mp", new Vector3(loc.X, loc.Y, loc.Z + 10000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(3000, () => Call("magicbullet", new Parameter[] { "ac130_105mm_mp", new Vector3(loc.X, loc.Y, loc.Z + 10000f), Utility.rngVec(loc, 100), player }));
+                    break;
+
+                case 2:
+                    AfterDelay(0, () => Call("magicbullet", new Parameter[] { "javelin_mp", new Vector3(loc.X, loc.Y, loc.Z + 10000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(2000, () => Call("magicbullet", new Parameter[] { "javelin_mp", new Vector3(loc.X, loc.Y, loc.Z + 10000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(4000, () => Call("magicbullet", new Parameter[] { "javelin_mp", new Vector3(loc.X, loc.Y, loc.Z + 10000f), Utility.rngVec(loc, 100), player }));
+                    break;
+
+                case 3:
+                    AfterDelay(0, () => Call("magicbullet", new Parameter[] { "sam_projectile_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(200, () => Call("magicbullet", new Parameter[] { "sam_projectile_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(400, () => Call("magicbullet", new Parameter[] { "sam_projectile_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(600, () => Call("magicbullet", new Parameter[] { "sam_projectile_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(800, () => Call("magicbullet", new Parameter[] { "sam_projectile_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(1000, () => Call("magicbullet", new Parameter[] { "sam_projectile_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(1200, () => Call("magicbullet", new Parameter[] { "sam_projectile_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(1400, () => Call("magicbullet", new Parameter[] { "sam_projectile_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(1600, () => Call("magicbullet", new Parameter[] { "sam_projectile_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(1800, () => Call("magicbullet", new Parameter[] { "sam_projectile_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(2000, () => Call("magicbullet", new Parameter[] { "sam_projectile_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(2200, () => Call("magicbullet", new Parameter[] { "sam_projectile_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(2400, () => Call("magicbullet", new Parameter[] { "sam_projectile_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(2600, () => Call("magicbullet", new Parameter[] { "sam_projectile_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(2800, () => Call("magicbullet", new Parameter[] { "sam_projectile_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(3000, () => Call("magicbullet", new Parameter[] { "sam_projectile_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(3200, () => Call("magicbullet", new Parameter[] { "sam_projectile_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(3400, () => Call("magicbullet", new Parameter[] { "sam_projectile_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(3600, () => Call("magicbullet", new Parameter[] { "sam_projectile_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(3800, () => Call("magicbullet", new Parameter[] { "sam_projectile_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
+                    break;
+
+                case 4:
+                    AfterDelay(0, () => Call("magicbullet", new Parameter[] { "stinger_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(500, () => Call("magicbullet", new Parameter[] { "stinger_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(1000, () => Call("magicbullet", new Parameter[] { "stinger_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(1500, () => Call("magicbullet", new Parameter[] { "stinger_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(2000, () => Call("magicbullet", new Parameter[] { "stinger_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
+                    AfterDelay(2500, () => Call("magicbullet", new Parameter[] { "stinger_mp", new Vector3(loc.X, loc.Y, loc.Z + 20000f), Utility.rngVec(loc, 100), player }));
+                    break;
+
+            }
         }
 
         public void usedAmmoBox(Entity player)
@@ -1480,83 +1603,102 @@ namespace INF2
             }
         }
 
+        private void repairDoor(Entity door, Entity player)
+        {
+            if (player.GetField<int>("repairsleft") == 0) return; // no repairs left on weapon
+
+            if (door.GetField<int>("hp") < door.GetField<int>("maxhp"))
+            {
+                door.SetField("hp", door.GetField<int>("hp") + 1);
+                player.SetField("repairsleft", player.GetField<int>("repairsleft") - 1);
+                player.Call("iprintlnbold", "Repaired Door! (" + player.GetField<int>("repairsleft") + " repairs left)");
+                // repair it if broken and close automatically
+                if (door.GetField<string>("state") == "broken")
+                {
+                    door.Call("moveto", new Parameter(door.GetField<Vector3>("close")), 1); // moveto
+                    AfterDelay(300, () =>
+                    {
+                        door.SetField("state", "close");
+                    });
+                }
+            }
+            else
+            {
+                player.Call("iprintlnbold", "Door has full health!");
+            }
+        }
+
         private void usedDoor(Entity door, Entity player)
         {
-            Action function = null;
-            Action action2 = null;
-            Action<Entity> action3 = null;
-            if (player.IsAlive)
+            if (!player.IsAlive) return;
+            // has repair weapon. do repair door
+            if (player.CurrentWeapon.Equals("defaultweapon_mp"))
             {
-                if (door.GetField<int>("hp") <= 0)
-                {
-                    if ((door.GetField<int>("hp") == 0) && (door.GetField<string>("state") != "broken"))
-                    {
-                        if (door.GetField<string>("state") == "close")
-                        {
-                            door.Call(0x8277, new Parameter[] { new Parameter(door.GetField<Vector3>("open")), 1f });
-                        }
-                        door.SetField("state", "broken");
-                    }
-                }
-                else if (Utility.GetPlayerTeam(player) == "allies")
+                repairDoor(door, player);
+                return;
+            }
+            if (door.GetField<int>("hp") > 0)
+            {
+                if (player.GetField<string>("sessionteam") == "allies")
                 {
                     if (door.GetField<string>("state") == "open")
                     {
-                        door.Call(0x8277, new Parameter[] { new Parameter(door.GetField<Vector3>("close")), 1 });
-                        if (function == null)
+                        door.Call("moveto", new Parameter(door.GetField<Vector3>("close")), 1); // moveto
+                        AfterDelay(300, () =>
                         {
-                            function = () => door.SetField("state", "close");
-                        }
-                        AfterDelay(300, function);
+                            door.SetField("state", "close");
+                        });
                     }
                     else if (door.GetField<string>("state") == "close")
                     {
-                        door.Call(0x8277, new Parameter[] { new Parameter(door.GetField<Vector3>("open")), 1 });
-                        if (action2 == null)
+                        door.Call("moveto", new Parameter(door.GetField<Vector3>("open")), 1); // moveto
+                        AfterDelay(300, () =>
                         {
-                            action2 = () => door.SetField("state", "open");
-                        }
-                        AfterDelay(300, action2);
+                            door.SetField("state", "open");
+                        });
                     }
                 }
-                else if ((door.GetField<string>("state") == "close") && (player.GetField<int>("attackeddoor") == 0))
+                else if (player.GetField<string>("sessionteam") == "axis")
                 {
-                    int num = 0;
-                    string str = player.Call<string>("getstance", new Parameter[0]);
-                    if (str != null)
+                    if (door.GetField<string>("state") == "close")
                     {
-                        if (!(str == "prone"))
+                        if (player.GetField<int>("attackeddoor") == 0)
                         {
-                            if (str == "couch")
+                            int hitchance = 0;
+                            switch (player.Call<string>("getstance"))
                             {
-                                num = 0x2d;
+                                case "prone":
+                                    hitchance = 20;
+                                    break;
+                                case "couch":
+                                    hitchance = 45;
+                                    break;
+                                case "stand":
+                                    hitchance = 90;
+                                    break;
+                                default:
+                                    break;
                             }
-                            else if (str == "stand")
+                            if (_rng.Next(100) < hitchance)
                             {
-                                num = 90;
+                                door.SetField("hp", door.GetField<int>("hp") - 1);
+                                player.Call("iprintlnbold", "HIT: " + door.GetField<int>("hp") + "/" + door.GetField<int>("maxhp"));
                             }
+                            else
+                            {
+                                player.Call("iprintlnbold", "^1MISS");
+                            }
+                            player.SetField("attackeddoor", 1);
+                            player.AfterDelay(1000, (e) => player.SetField("attackeddoor", 0));
                         }
-                        else
-                        {
-                            num = 20;
-                        }
                     }
-                    if (_rng.Next(100) < num)
-                    {
-                        door.SetField("hp", door.GetField<int>("hp") - 1);
-                        player.Call("iprintlnbold", new Parameter[] { string.Concat(new object[] { "HIT: ", door.GetField<int>("hp"), "/", door.GetField<int>("maxhp") }) });
-                    }
-                    else
-                    {
-                        player.Call("iprintlnbold", new Parameter[] { "^1MISS" });
-                    }
-                    player.SetField("attackeddoor", 1);
-                    if (action3 == null)
-                    {
-                        action3 = e => player.SetField("attackeddoor", 0);
-                    }
-                    player.AfterDelay(0x3e8, action3);
                 }
+            }
+            else if (door.GetField<int>("hp") == 0 && door.GetField<string>("state") != "broken")
+            {
+                if (door.GetField<string>("state") == "close")
+                    door.Call("moveto", new Parameter(door.GetField<Vector3>("open")), 1f); // moveto
+                door.SetField("state", "broken");
             }
         }
 
@@ -1604,51 +1746,57 @@ namespace INF2
                     player.Call("iprintln", new Parameter[] { "^1Mystery box need $500." });
                     return;
                 }
-                Weapon weapon = Weapon.GetRandomWeapon();
-                if (player.HasWeapon(weapon.Text))
-                {
-                    player.Call("givemaxammo", new Parameter[] { weapon.Text });
-                    player.SwitchToWeapon(weapon.Text);
-                    player.Call("iprintlnbold", weapon.Name);
-                }
                 else
                 {
-                    if (player.GetField<string>("secondweapon") != "none")
+                    player.SetField("inf2_money", player.GetField<int>("inf2_money") - 500);
+                    Weapon weapon = Weapon.GetRandomWeapon();
+                    if (player.HasWeapon(weapon.Text))
                     {
-                        if (player.GetField<string>("firstweapon") == player.CurrentWeapon)
+                        if (weapon.Text == "defaultweapon_mp")
                         {
-                            player.SetField("firstweapon", weapon.Text);
+                            player.Call("setweaponammoclip", weapon.Text, 0);
+                            player.Call("setweaponammostock", weapon.Text, 0);
                         }
-                        else if (player.GetField<string>("secondweapon") == player.CurrentWeapon)
+                        else
                         {
-                            player.SetField("secondweapon", weapon.Text);
+                            player.Call("givemaxammo", new Parameter[] { weapon.Text });
                         }
-                        player.TakeWeapon(player.CurrentWeapon);
+                        player.SwitchToWeapon(weapon.Text);
+                        player.Call("iprintlnbold", weapon.Name);
+                        Call("iprintln", player.Name + " buy weapon - " + weapon.Name);
                     }
                     else
                     {
-                        if (player.GetField<string>("firstweapon") != "none")
+                        if (player.GetField<string>("secondweapon") != "none")
                         {
-                            player.SetField("firstweapon", weapon.Text);
-                        }
-                        if (player.GetField<string>("firstweapon") == Call<string>("getdvar", "scr_inf2_initweapon"))
-                        {
-                            player.TakeWeapon(Call<string>("getdvar", "scr_inf2_initweapon"));
-                            player.SetField("firstweapon", weapon.Text);
+                            if (player.GetField<string>("firstweapon") == player.CurrentWeapon)
+                            {
+                                player.SetField("firstweapon", weapon.Text);
+                            }
+                            else if (player.GetField<string>("secondweapon") == player.CurrentWeapon)
+                            {
+                                player.SetField("secondweapon", weapon.Text);
+                            }
+                            player.TakeWeapon(player.CurrentWeapon);
                         }
                         else
                         {
                             player.SetField("secondweapon", weapon.Text);
                         }
+                        player.GiveWeapon(weapon.Text);
+                        if (weapon.Text == "defaultweapon_mp")
+                        {
+                            player.Call("setweaponammoclip", weapon.Text, 0);
+                            player.Call("setweaponammostock", weapon.Text, 0);
+                        }
+                        else
+                        {
+                            player.Call("givemaxammo", new Parameter[] { weapon.Text });
+                        }
+                        AfterDelay(300, () => player.SwitchToWeaponImmediate(weapon.Text));
+                        player.Call("iprintlnbold", weapon.Name);
+                        Call("iprintln", player.Name + " buy weapon - " + weapon.Name);
                     }
-                    player.GiveWeapon(weapon.Text);
-                    player.Call("givemaxammo", new Parameter[] { weapon.Text });
-                    player.SwitchToWeaponImmediate(weapon.Text);
-                    player.Call("iprintlnbold", weapon.Name);
-                    Call("iprintln", player.Name + " get weapon - " + weapon.Name);
-
-                    if (Call<int>("getdvarint", "scr_inf2_developer") == 1)
-                        Log.Debug(player.Name + " get weapon - " + weapon.Name);
                 }
             }
         }

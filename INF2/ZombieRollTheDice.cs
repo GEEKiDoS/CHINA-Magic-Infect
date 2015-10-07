@@ -17,7 +17,6 @@ namespace INF2
 
         void RollTheDice_PlayerConnected(Entity obj)
         {
-            obj.Call("visionsetnakedforplayer", "", 1);
             OnPlayerSpawned(obj);
             obj.SpawnedPlayer += () => OnPlayerSpawned(obj);
         }
@@ -198,8 +197,19 @@ namespace INF2
                     player.Call("allowjump", false);
                     break;
                 case 24:
-                    rollname = "^1Can't Jump";
-                    player.Call("allowjump", false);
+                    rollname = "^3Riotshield Juggernaut";
+                    player.SetField("maxhealth", player.Health * 3);
+                    player.Health = player.Health * 3;
+                    player.Call("setmodel", "mp_fullbody_opforce_juggernaut");
+                    player.Call("setviewmodel", "viewhands_juggernaut_opforce");
+                    player.SetPerk("specialty_fastermelee", true, true);
+                    player.SetPerk("specialty_lightweight", true, true);
+                    player.TakeWeapon(player.CurrentWeapon);
+                    player.GiveWeapon("riotshield_mp");
+                    AfterDelay(300, () => player.SwitchToWeaponImmediate("riotshield_mp"));
+                    player.AfterDelay(150,
+                                      entity =>
+                                      player.Call("attachshieldmodel", "weapon_riot_shield_mp", "tag_shield_back"));
                     break;
                 case 25:
                     rollname = "^2Riotshield";
@@ -237,7 +247,19 @@ namespace INF2
                                       player.Call("attachshieldmodel", "weapon_riot_shield_mp", "tag_shield_back"));
                     break;
                 case 29:
-                    rollname = "None";
+                    rollname = "^3Riotshield Juggernaut";
+                    player.SetField("maxhealth", player.Health * 3);
+                    player.Health = player.Health * 3;
+                    player.Call("setmodel", "mp_fullbody_opforce_juggernaut");
+                    player.Call("setviewmodel", "viewhands_juggernaut_opforce");
+                    player.SetPerk("specialty_fastermelee", true, true);
+                    player.SetPerk("specialty_lightweight", true, true);
+                    player.TakeWeapon(player.CurrentWeapon);
+                    player.GiveWeapon("riotshield_mp");
+                    AfterDelay(300, () => player.SwitchToWeaponImmediate("riotshield_mp"));
+                    player.AfterDelay(150,
+                                      entity =>
+                                      player.Call("attachshieldmodel", "weapon_riot_shield_mp", "tag_shield_back"));
                     break;
                 case 30:
                     rollname = "^2USP45 Akimbo";
@@ -328,7 +350,9 @@ namespace INF2
                     rollname = "None";
                     break;
                 case 47:
-                    rollname = "None";
+                    rollname = "^3Godmode for 3 second";
+                    player.Health = -1;
+                    AfterDelay(3000, () => player.Health = player.GetField<int>("maxhealth"));
                     break;
                 case 48:
                     rollname = "^2M320";
@@ -339,15 +363,20 @@ namespace INF2
                     AfterDelay(300, () => player.SwitchToWeaponImmediate("m320_mp"));
                     break;
                 case 49:
-                    rollname = "None";
-                    break;
-                case 50:
-                    rollname = "^2One Ammo SVD";
-                    string weapon2 = Utilities.BuildWeaponName("iw5_dragunov", "none", "none", 0, 0);
+                    rollname = "^2One Ammo MK14";
+                    string weapon2 = "iw5_mk14_mp";
                     player.GiveWeapon(weapon2);
                     player.Call("setweaponammoclip", weapon2, 1);
                     player.Call("setweaponammostock", weapon2, 0);
                     AfterDelay(300, () => player.SwitchToWeaponImmediate(weapon2));
+                    break;
+                case 50:
+                    rollname = "^2One Ammo SVD";
+                    string weapon3 = Utilities.BuildWeaponName("iw5_dragunov", "none", "none", 0, 0);
+                    player.GiveWeapon(weapon3);
+                    player.Call("setweaponammoclip", weapon3, 1);
+                    player.Call("setweaponammostock", weapon3, 0);
+                    AfterDelay(300, () => player.SwitchToWeaponImmediate(weapon3));
                     break;
                 case 51:
                     rollname = "^2Unlimited Grenades";
@@ -358,7 +387,7 @@ namespace INF2
                     player.TakeWeapon(player.CurrentWeapon);
                     player.GiveWeapon("rpg_mp");
                     player.Call("setweaponammoclip", "rpg_mp", 1);
-                    player.Call("setweaponammostock", "rpg_mp", 0);
+                    player.Call("setweaponammostock", "rpg_mp", 1);
                     AfterDelay(300, () => player.SwitchToWeaponImmediate("rpg_mp"));
                     break;
                 case 53:
@@ -366,7 +395,12 @@ namespace INF2
                     OnInterval(100, () => Nades(player, 99));
                     break;
                 case 54:
-                    rollname = "None";
+                    rollname = "^3Extra Speed and AA12";
+                    player.TakeWeapon(player.CurrentWeapon);
+                    player.GiveWeapon("iw5_aa12_mp_xmags_camo11");
+                    player.Call("setweaponammostock", "iw5_aa12_mp_xmags_camo11", 0);
+                    AfterDelay(300, () => player.SwitchToWeaponImmediate("iw5_aa12_mp_xmags_camo11"));
+                    OnInterval(100, () => Speed(player, 1.5));
                     break;
                 case 55:
                     rollname = "^2Unlimited Grenades";

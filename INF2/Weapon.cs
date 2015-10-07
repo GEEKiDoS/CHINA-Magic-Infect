@@ -18,7 +18,7 @@ namespace INF2
         public static string[] _arList = new string[] { "iw5_fad", "iw5_acr", "iw5_type95", "iw5_mk14", "iw5_scar", "iw5_g36c", "iw5_cm901" };
         public static string[] _autoPistolList = new string[] { "iw5_fmg9", "iw5_skorpion", "iw5_mp9", "iw5_g18" };
         public static string[] _lmgList = new string[] { "iw5_m60", "iw5_mk46", "iw5_pecheneg", "iw5_sa80", "iw5_mg36" };
-        public static string[] _otherList = new string[] { "rpg_mp", "iw5_smaw_mp", "xm25_mp", "m320_mp", "riotshield_mp", "javelin_mp", "stinger_mp", "uav_strike_marker_mp", "defaultweapon_mp", "iw5_spas12_mp_eotech_grip_silencer03_camo11", "iw5_striker_mp_eotech_grip_silencer03_camo11", "iw5_m60jugg_mp_eotechlmg_grip_camo11" };
+        public static string[] _otherList = new string[] { "rpg_mp", "iw5_smaw_mp", "xm25_mp", "m320_mp", "riotshield_mp", "javelin_mp", "stinger_mp", "uav_strike_marker_mp", "defaultweapon_mp", "iw5_spas12_mp_eotech_grip_silencer03_camo11", "iw5_striker_mp_eotech_grip_silencer03_camo11", "iw5_m60jugg_mp_eotechlmg_grip_heartbeat_camo01", "c4death_mp" };
         public static string[] _pistol2List = new string[] { "iw5_44magnum", "iw5_mp412", "iw5_deserteagle" };
         public static string[] _pistolList = new string[] { "iw5_usp45", "iw5_p99", "iw5_fnfiveseven" };
         public static string[] _shotgunList = new string[] { "iw5_1887", "iw5_striker", "iw5_aa12", "iw5_usas12", "iw5_spas12", "iw5_ksg" };
@@ -97,11 +97,12 @@ namespace INF2
             }
             if (_shotgunList.Contains(baseWeapon))
             {
-                str = GetShotgunAttachments1[_rng.Next(0, GetShotgunAttachments1.Length)];
-                str2 = GetShotgunAttachments2[_rng.Next(0, GetShotgunAttachments2.Length)];
+                if (!baseWeapon.Contains("1887"))
+                {
+                    str = GetShotgunAttachments1[_rng.Next(0, GetShotgunAttachments1.Length)];
+                    str2 = GetShotgunAttachments2[_rng.Next(0, GetShotgunAttachments2.Length)];
+                }
             }
-            str = "none";
-            str2 = "none";
 
             if (!_otherList.Contains(baseWeapon))
             {
@@ -112,17 +113,7 @@ namespace INF2
 
         private static string GetWeaponName(string text)
         {
-            string temp = "";
-            if (!_otherList.Contains(text))
-            {
-                temp = text.Split(new string[] { "_mp" }, 2, StringSplitOptions.RemoveEmptyEntries)[0];
-            }
-            else
-            {
-                temp = text;
-            }
-
-            switch (temp)
+            switch (text)
             {
                 case "iw5_m16": return "M16A4";
                 case "iw5_m4": return "M4A1";
@@ -143,13 +134,13 @@ namespace INF2
                 case "iw5_pecheneg": return "PKP Pecheneg";
                 case "iw5_sa80": return "L86 LSW";
                 case "iw5_mg36": return "MG36";
-                case "rpg": return "RPG-7";
-                case "iw5_smaw": return "SMAW";
-                case "xm25": return "XM25";
-                case "m320": return "M320";
-                case "riotshield": return "Riotshield";
-                case "javelin": return "Javelin";
-                case "stinger": return "^3Noob Stinger";
+                case "rpg_mp": return "RPG-7";
+                case "iw5_smaw_mp": return "SMAW";
+                case "xm25_mp": return "XM25";
+                case "m320_mp": return "M320";
+                case "riotshield_mp": return "Riotshield";
+                case "javelin_mp": return "Javelin";
+                case "stinger_mp": return "^3Noob Stinger";
                 case "iw5_44magnum": return ".44 Magnum";
                 case "iw5_mp412": return "MP412";
                 case "iw5_deserteagle": return "Desert Eagle";
@@ -175,10 +166,12 @@ namespace INF2
                 case "iw5_as50": return "AS50";
                 case "iw5_l96a1": return "L118A";
                 case "uav_strike_marker_mp": return "^3NZ3 Noob Gun";
-                case "defaultweapon_mp": return "^3SAM Lanucher";
+                case "iw5_aa12_mp_eotech_grip_silencer03_camo11": return "^3SAM Lanucher";
                 case "iw5_spas12_mp_eotech_grip_silencer03_camo11": return "^3MRL";
                 case "iw5_striker_mp_eotech_grip_silencer03_camo11": return "^3MDL";
-                case "iw5_m60jugg_mp_eotechlmg_grip_camo11": return "^2AUG HBAR";
+                case "iw5_m60jugg_mp_eotechlmg_grip_heartbeat_camo01": return "^2AUG HBAR";
+                case "c4death_mp": return "^1Fake C4";
+                case "defaultweapon_mp": return "^2Door Repair Tool";
                 default:
                     return string.Empty;
             }
@@ -186,9 +179,10 @@ namespace INF2
 
         public static Weapon GetRandomWeapon()
         {
-            string item = _weaponList[_rng.Next(0, _weaponList.Length)];
+            string baseweapon = _weaponList[_rng.Next(0, _weaponList.Length)];
+            string item = AddRandomAttachmentToWeapon(baseweapon);
             Weapon temp = new Weapon();
-            temp.Name = GetWeaponName(item);
+            temp.Name = GetWeaponName(baseweapon);
             temp.Text = item;
             return temp;
         }
